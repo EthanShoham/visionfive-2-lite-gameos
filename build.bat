@@ -8,7 +8,7 @@
 :: mabi  = ABI (how functions pass arguments, use registers, and lay out the stack)
 :: lp64  = 64-bit longs and pointers, integer-only ABI (no FPU usage)
 
-riscv-none-elf-gcc -c start.S -o start.o ^
+riscv-none-elf-gcc -c entry.S -o entry.o ^
     -march=rv64imac_zicsr -mabi=lp64
 
 
@@ -20,10 +20,10 @@ riscv-none-elf-gcc -c start.S -o start.o ^
 :: -nostartfiles    = do not use default C runtime startup (crt0)
 :: -march / -mabi   = same ISA and ABI as assembly code (must match!)
 
-::riscv-none-elf-gcc -c entry.c -o entry.o ^
-::    -Os -ffreestanding -fno-builtin -fno-pic ^
-::    -nostdlib -nostartfiles ^
-::    -march=rv64imac -mabi=lp64
+riscv-none-elf-gcc -c start.c -o start.o ^
+    -Os -ffreestanding -fno-builtin -fno-pic ^
+    -nostdlib -nostartfiles ^
+    -march=rv64imac -mabi=lp64
 
 
 :: Link stage:
@@ -33,10 +33,10 @@ riscv-none-elf-gcc -c start.S -o start.o ^
 :: -Wl,--gc-sections= garbage-collect unused code/data sections (reduces SPL size)
 
 riscv-none-elf-gcc -o boot.elf ^
+    entry.o ^
     start.o ^
     -nostdlib -nostartfiles ^
     -Wl,-m,elf64lriscv -Wl,-T,linker.ld -Wl,--gc-sections
-::    entry.o ^
 
 
 :: Convert ELF file to raw binary
