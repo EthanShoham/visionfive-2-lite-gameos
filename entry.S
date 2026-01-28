@@ -1,7 +1,7 @@
-.section .text.entry
+.section .text
 .globl _entry
 _entry:
-    la sp, __stack_top
+    la sp, stack0
     li a0, 1024*4
     csrr a1, mhartid
     addi a1, a1, 1
