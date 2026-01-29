@@ -5,6 +5,9 @@
 int main();
 void timerinit();
 void boardinit(u32 cpu_id);
+void uart0_hw_init();
+void uart0_putc(char c);
+void uart0_puts(const char *s);
 
 __attribute__((aligned(16))) u8 stack0[4096 * NCPU];
 
@@ -13,6 +16,11 @@ void start() {
   // keep each CPU's hartid in its tp register, for cpuid().
   i32 id = read_mhartid_csr();
   write_tp_reg(id);
+
+  if (id == 0) {
+    uart0_hw_init();
+    uart0_putc('0');
+  }
 
   boardinit(id);
 

@@ -100,7 +100,7 @@ static void uart0_init(u32 uart_clk_hz, u32 baud) {
   mmio_write32(uart_reg(REG_IIR_FCR), FCR_EN | FCR_RXRST | FCR_TXRST);
 }
 
-static void uart0_hw_init(void) {
+void uart0_hw_init(void) {
   set_bits(SYS_CRG_BASE + UART0_CLK_APB_OFFSET, CLK_ENABLE_MASK);
   set_bits(SYS_CRG_BASE + UART0_CLK_CORE_OFFSET, CLK_ENABLE_MASK);
   clear_bits(SYS_CRG_BASE + SYSCRG_RESET_ASSERT2, (1u << 19) | (1u << 20));
@@ -113,13 +113,13 @@ static void uart0_hw_init(void) {
 
 #define LSR_THRE 0x20u /* LSR[5] THR empty */
 
-static void uart0_putc(char c) {
+void uart0_putc(char c) {
   while ((mmio_read32(uart_reg(REG_LSR)) & LSR_THRE) == 0u) {
   }
   mmio_write32(uart_reg(REG_THR_RBR_DLL), (u32)(u8)c);
 }
 
-static void uart0_puts(const char *s) {
+void uart0_puts(const char *s) {
   for (; *s; s++) {
     char c = *s;
     if (c == '\n') {
@@ -134,7 +134,6 @@ int ddr_sanity_test(void);
 i32 main() {
   i32 id = cpuid();
   if (id == 0) {
-    uart0_hw_init();
     // Enable AON GPIOs
     mmio_write32(AON_GPIO_ENABLE, 1);
 
