@@ -7,7 +7,7 @@ SECTIONS
    * jh7110 BootROM loads flash into L2 cach at starting address 0x08000000
    */
   . = 0x08000000;
-  __start = .;
+  begining = .;
 
   .text : {
     ./build/entry.o(_entry)
@@ -41,6 +41,6 @@ SECTIONS
     *(.bss .bss.*)
   }
 
-  ASSERT(. - __start <= 0x00200000, "error: binary file is larger then 2MB")
+  ASSERT(. - begining <= 0x00200000, "error: binary file is larger then 2MB")
   PROVIDE(end = .);
 }

@@ -86,6 +86,12 @@ riscv-none-elf-gcc -c %KERNEL_DIR%/proc.c -o %BUILD_DIR%/proc.o ^
     -nostdlib -nostartfiles ^
     -march=rv64imac_zicsr -mabi=lp64
 
+riscv-none-elf-gcc -c %KERNEL_DIR%/spinlock.c -o %BUILD_DIR%/spinlock.o ^
+    -Os -ffreestanding -fno-builtin -fno-pic -msmall-data-limit=0 ^
+    -nostdlib -nostartfiles ^
+    -march=rv64imac_zicsr -mabi=lp64
+
+
 
 
 :: Link stage:
@@ -106,6 +112,7 @@ riscv-none-elf-gcc -o %BUILD_DIR%/boot.elf ^
     %BUILD_DIR%/start.o ^
     %BUILD_DIR%/main.o ^
     %BUILD_DIR%/proc.o ^
+    %BUILD_DIR%/spinlock.o ^
     -nostdlib -nostartfiles ^
     -Wl,-m,elf64lriscv -Wl,-T,%KERNEL_DIR%/kernel.ld -Wl,--gc-sections ^
     -Wl,--no-warn-rwx-segments

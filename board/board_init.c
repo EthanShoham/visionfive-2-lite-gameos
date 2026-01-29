@@ -1,18 +1,15 @@
 #include "jh7110.h"
 
+void uart0_putc(char c);
 void ddr_init_lpddr4_8g_2800(void);
 
-volatile static b32 is_board_init = 0;
 
-void boardinit(u32 cpu_id) {
-  if (cpu_id != 0) {
-    while (!is_board_init)
-      ;
-    return;
-  }
-
+void boardinit() {
+  uart0_putc('a');
   pll0_set_1ghz();
+  uart0_putc('b');
   pll2_set_1188mhz();
+  uart0_putc('c');
 
   clrsetbits32(SYS_CRG_BASE + CLK_CPU_ROOT_OFFSET, CLK_CPU_ROOT_SW_MASK,
                (1u << CLK_CPU_ROOT_SW_SHIFT) & CLK_CPU_ROOT_SW_MASK);
@@ -36,8 +33,8 @@ void boardinit(u32 cpu_id) {
   /* optional but U‑Boot does it before DDR */
   clrsetbits32(SYS_CRG_BASE + CLK_QSPI_REF_OFFSET, CLK_QSPI_REF_SW_MASK,
                (1u << CLK_QSPI_REF_SW_SHIFT) & CLK_QSPI_REF_SW_MASK);
-
+  uart0_putc('d');
   ddr_init_lpddr4_8g_2800();
-
-  is_board_init = 1;
+  uart0_putc('e');
+  uart0_putc('f');
 }

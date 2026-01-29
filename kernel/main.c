@@ -1,7 +1,8 @@
 #include "../common/types.h"
 #include "defs.h"
+#include "spinlock.h"
 
-#define MIL 3000000
+#define MIL 1000000000
 
 #define AON_IOMUX_CFG_BASE 0x17020000
 #define AON_GPIO_DOEN AON_IOMUX_CFG_BASE
@@ -22,9 +23,11 @@
 #define GPIO_DOUT_MASK 0x7f
 #define GPIO_DIN_MASK 0x7f
 
-static inline void delay(volatile u64 count) {
-  while (count--)
-    ;
+static inline void udelay(u32 usec) {
+  u32 count = usec * 500u;
+  while (count--) {
+    asm volatile("nop");
+  }
 }
 
 static inline u32 mmio_read32(uptr a) { return *(volatile u32 *)a; }
@@ -100,7 +103,13 @@ static void uart0_init(u32 uart_clk_hz, u32 baud) {
   mmio_write32(uart_reg(REG_IIR_FCR), FCR_EN | FCR_RXRST | FCR_TXRST);
 }
 
+static struct {
+    struct spinlock lock;
+} console;
+
 void uart0_hw_init(void) {
+  initlock(&console.lock, "console");
+
   set_bits(SYS_CRG_BASE + UART0_CLK_APB_OFFSET, CLK_ENABLE_MASK);
   set_bits(SYS_CRG_BASE + UART0_CLK_CORE_OFFSET, CLK_ENABLE_MASK);
   clear_bits(SYS_CRG_BASE + SYSCRG_RESET_ASSERT2, (1u << 19) | (1u << 20));
@@ -114,9 +123,11 @@ void uart0_hw_init(void) {
 #define LSR_THRE 0x20u /* LSR[5] THR empty */
 
 void uart0_putc(char c) {
+  acquire(&console.lock);
   while ((mmio_read32(uart_reg(REG_LSR)) & LSR_THRE) == 0u) {
   }
   mmio_write32(uart_reg(REG_THR_RBR_DLL), (u32)(u8)c);
+  release(&console.lock);
 }
 
 void uart0_puts(const char *s) {
@@ -129,11 +140,15 @@ void uart0_puts(const char *s) {
   }
 }
 
+volatile i32 panicking = 0;
+volatile i32 panicked = 0;
+
 int ddr_sanity_test(void);
 
 i32 main() {
+  uart0_putc('m');
   i32 id = cpuid();
-  if (id == 0) {
+  if (id == 1) {
     // Enable AON GPIOs
     mmio_write32(AON_GPIO_ENABLE, 1);
 
@@ -153,12 +168,12 @@ i32 main() {
       mmio_write32(AON_GPIO_DOUT,
                    (mmio_read32(AON_GPIO_DOUT) & 0xF0FFFFFF) | 0x01000000);
 
-      delay(MIL);
+      udelay(1000000);
 
       // Set AON GPIO3 as low
       mmio_write32(AON_GPIO_DOUT, mmio_read32(AON_GPIO_DOUT) & 0xF0FFFFFF);
 
-      delay(MIL);
+      udelay(1000000);
     }
   } else {
     for (;;)

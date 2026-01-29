@@ -43,13 +43,13 @@ static inline void write_mepc_csr(u64 x) {
 #define SSTATUS_SIE (1L << 1)  // Supervisor Interrupt Enable
 #define SSTATUS_UIE (1L << 0)  // User Interrupt Enable
 
-static inline u64 r_sstatus() {
+static inline u64 read_sstatus_csr() {
   u64 x;
   asm volatile("csrr %0, sstatus" : "=r"(x));
   return x;
 }
 
-static inline void w_sstatus(u64 x) {
+static inline void write_sstatus_csr(u64 x) {
   asm volatile("csrw sstatus, %0" : : "r"(x));
 }
 
@@ -213,14 +213,14 @@ static inline u64 read_time_csr() {
 }
 
 // enable device interrupts
-static inline void intr_on() { w_sstatus(r_sstatus() | SSTATUS_SIE); }
+static inline void interrupts_on() { write_sstatus_csr(read_sstatus_csr() | SSTATUS_SIE); }
 
 // disable device interrupts
-static inline void intr_off() { w_sstatus(r_sstatus() & ~SSTATUS_SIE); }
+static inline void interrupts_off() { write_sstatus_csr(read_sstatus_csr() & ~SSTATUS_SIE); }
 
 // are device interrupts enabled?
-static inline int intr_get() {
-  u64 x = r_sstatus();
+static inline int interrupts_get() {
+  u64 x = read_sstatus_csr();
   return (x & SSTATUS_SIE) != 0;
 }
 
