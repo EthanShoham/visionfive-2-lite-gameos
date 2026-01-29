@@ -1,5 +1,5 @@
-#ifndef MEMLAYOUT
-#define MEMLAYOUT
+#ifndef __MEMLAYOUT__
+#define __MEMLAYOUT__
 
 #define TRAMPOLINE (MAXVA - PGSIZE)
 

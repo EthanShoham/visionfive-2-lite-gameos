@@ -1,4 +1,5 @@
-#include "riscv.h"
+#include "../common/types.h"
+#include "defs.h"
 
 #define MIL 3000000
 
@@ -22,7 +23,8 @@
 #define GPIO_DIN_MASK 0x7f
 
 static inline void delay(volatile u64 count) {
-  while (count--);
+  while (count--)
+    ;
 }
 
 static inline u32 mmio_read32(uptr a) { return *(volatile u32 *)a; }
@@ -127,19 +129,10 @@ static void uart0_puts(const char *s) {
   }
 }
 
-static int cpuid() {
-  int id = read_tp_reg();
-  return id;
-}
+int ddr_sanity_test(void);
 
-#define NCPU 5
-
-__attribute__ ((aligned (16))) u8 stack0[4096 * NCPU];
-
-void start() {
-  int id = read_mhartid();
-  write_tp_reg(id);
-
+i32 main() {
+  i32 id = cpuid();
   if (id == 0) {
     uart0_hw_init();
     // Enable AON GPIOs
@@ -149,6 +142,11 @@ void start() {
     mmio_write32(AON_GPIO_DOEN, mmio_read32(AON_GPIO_DOEN) & 0xF8FFFFFF);
 
     uart0_puts("Hello World!\n");
+    if (ddr_sanity_test() == 0) {
+      uart0_puts("DDR test: OK\n");
+    } else {
+      uart0_puts("DDR test: FAIL\n");
+    }
 
     uart0_putc(id + 48);
     for (;;) {
@@ -164,6 +162,7 @@ void start() {
       delay(MIL);
     }
   } else {
-    for(;;);
+    for (;;)
+      ;
   }
 }
