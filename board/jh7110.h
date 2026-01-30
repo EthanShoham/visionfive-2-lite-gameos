@@ -87,6 +87,8 @@
 #define CLK_QSPI_REF_SW_SHIFT 24
 #define CLK_QSPI_REF_SW_MASK 0x1000000u
 
+#define SYSCRG_RESET_ASSERT1_OFFSET 0x2FC
+
 // ---- PLL1 fields (from U-Boot jh7110 pll.c) ----
 #define PLL1_DACPD_MASK BIT(15)
 #define PLL1_DSMPD_MASK BIT(16)

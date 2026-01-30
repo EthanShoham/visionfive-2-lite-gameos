@@ -1,5 +1,5 @@
-#ifndef __DEFS__
-#define __DEFS__
+#ifndef DEFS_H
+#define DEFS_H
 #include "../common/types.h"
 
 struct spinlock;

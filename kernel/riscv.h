@@ -1,5 +1,5 @@
-#ifndef __RISCV__
-#define __RISCV__
+#ifndef RISCV_H
+#define RISCV_H
 
 #ifndef __ASSEMBLER__
 #include "../common/types.h"
@@ -17,6 +17,7 @@ static inline u64 read_mhartid_csr() {
 #define MSTATUS_MPP_M (3L << 11)
 #define MSTATUS_MPP_S (1L << 11)
 #define MSTATUS_MPP_U (0L << 11)
+#define MSTATUS_MIE (1L << 3)
 
 static inline u64 read_mstatus_csr() {
   u64 x;
@@ -26,6 +27,11 @@ static inline u64 read_mstatus_csr() {
 
 static inline void write_mstatus_csr(u64 x) {
   asm volatile("csrw mstatus, %0" : : "r"(x));
+}
+
+// Machine Trap-Vector Base Address
+static inline void write_mtvec_csr(u64 x) {
+  asm volatile("csrw mtvec, %0" : : "r"(x));
 }
 
 // machine exception program counter, holds the
@@ -65,6 +71,7 @@ static inline void w_sip(u64 x) { asm volatile("csrw sip, %0" : : "r"(x)); }
 // Supervisor Interrupt Enable
 #define SIE_SEIE (1L << 9) // external
 #define SIE_STIE (1L << 5) // timer
+#define SIE_SSIE (1L << 1) // software
 static inline u64 read_sie_csr() {
   u64 x;
   asm volatile("csrr %0, sie" : "=r"(x));
@@ -77,6 +84,7 @@ static inline void write_sie_csr(u64 x) {
 
 // Machine-mode Interrupt Enable
 #define MIE_STIE (1L << 5) // supervisor timer
+#define MIE_MTIE (1L << 7) // machine timer
 static inline u64 read_mie_csr() {
   u64 x;
   asm volatile("csrr %0, mie" : "=r"(x));

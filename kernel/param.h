@@ -1,6 +1,6 @@
-#ifndef __PARAM__
-#define __PARAM__
+#ifndef PARAM_H
+#define PARAM_H
 
-#define NCPU 5
+#define NCPU 4
 
 #endif

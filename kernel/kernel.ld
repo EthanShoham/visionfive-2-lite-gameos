@@ -1,16 +1,15 @@
+KERNEL_START = DEFINED(KERNEL_START) ? KERNEL_START : 0x40000000;
+
 OUTPUT_ARCH(riscv)
 ENTRY(_entry)
 
 SECTIONS
 {
-  /*
-   * jh7110 BootROM loads flash into L2 cach at starting address 0x08000000
-   */
-  . = 0x08000000;
-  begining = .;
+  . = KERNEL_START;
+  kernel_begining = .;
 
   .text : {
-    ./build/entry.o(_entry)
+    KEEP(*(.text.entry))
     *(.text .text.*)
     . = ALIGN(0x1000);
     _trampoline = .;
@@ -41,6 +40,6 @@ SECTIONS
     *(.bss .bss.*)
   }
 
-  ASSERT(. - begining <= 0x00200000, "error: binary file is larger then 2MB")
-  PROVIDE(end = .);
+  ASSERT(. - kernel_begining <= 0x00200000, "error: binary file is larger then 2MB")
+  kernel_end = .;
 }

@@ -68,30 +68,3 @@ void ddr_init_lpddr4_8g_2800(void) {
               (u32 *)(DDR_CTRL_BASE + SEC_CTRL_ADDR),
               (u32 *)DDR_PHY_BASE, DDR_SIZE_8G);
 }
-
-int ddr_sanity_test(void) {
-  volatile u32 *mem = (volatile u32 *)DDR_BASE;
-  const u32 count = 256;
-  const u32 pat1 = 0xA5A5A5A5u;
-  const u32 pat2 = 0x5A5A5A5Au;
-
-  for (u32 i = 0; i < count; i++) {
-    mem[i] = pat1 ^ i;
-  }
-  for (u32 i = 0; i < count; i++) {
-    if (mem[i] != (pat1 ^ i)) {
-      return -1;
-    }
-  }
-
-  for (u32 i = 0; i < count; i++) {
-    mem[i] = pat2 ^ (i * 3u);
-  }
-  for (u32 i = 0; i < count; i++) {
-    if (mem[i] != (pat2 ^ (i * 3u))) {
-      return -1;
-    }
-  }
-
-  return 0;
-}

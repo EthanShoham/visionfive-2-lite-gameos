@@ -1,5 +1,5 @@
-#ifndef __SPINLOCK__
-#define __SPINLOCK__
+#ifndef SPINLOCK_H
+#define SPINLOCK_H
 #include "../common/types.h"
 #include "proc.h"
 
