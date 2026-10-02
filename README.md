@@ -62,9 +62,9 @@ The long-term goal is a custom handheld PC: this board, a custom OS, and games w
 - LPDDR4 bring-up and a DDR read/write test
 - Loading the supervisor and kernel from flash into DDR, with copy verification
 - Releasing the U74 cores into the kernel
-- Kernel machine-mode setup and the switch to supervisor mode on each U74 core, with timer interrupts
 
 **In progress:**
+- Kernel bring-up on the U74 cores: machine-mode setup, trap delegation, timer interrupts and the switch to supervisor mode (written, being debugged)
 - Porting the rest of xv6: paging, processes, scheduler, system calls, file system
 
 **Planned:**
@@ -97,8 +97,13 @@ The output is `out/gameos.bin.normal.out`, an image with the SPL header that the
 
 ## Flashing and running
 
-<!-- TODO(Ethan): describe how you write the image to QSPI flash (tool and commands). -->
-Write `out/gameos.bin.normal.out` to the SPL area of the board's QSPI flash, set the boot-mode switches to boot from flash, and connect a USB-to-serial adapter to UART0 at 115200 baud to watch the boot log.
+1. Connect a USB-to-serial adapter to UART0 (115200 baud).
+2. Put the board in **UART boot mode** and power it on. The boot ROM waits for an XMODEM transfer.
+3. Send StarFive's recovery/flashing tool ([`jh7110-recovery-*.bin`](https://github.com/starfive-tech/Tools/tree/master/recovery)) over XMODEM.
+4. In the tool's menu, choose **update SPL** and send `out/gameos.bin.normal.out`. It is written to the SPL area of the QSPI flash.
+5. Switch back to **QSPI boot mode** and reset. The boot log appears on UART0.
+
+See StarFive's [Recovering the Bootloader](https://doc-en.rvspace.org/VisionFive2/Quick_Start_Guide/VisionFive2_SDK_QSG/recovering_bootloader%20-%20vf2.html) guide for details.
 
 ## License
 
