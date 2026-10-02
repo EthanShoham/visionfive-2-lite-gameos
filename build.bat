@@ -260,5 +260,9 @@ powershell -NoProfile -Command ^
 
 copy /b "%OUT_DIR%\boot.bin"+"%OUT_DIR%\binary.hdr"+"%OUT_DIR%\supervisor.bin"+"%OUT_DIR%\kernel.bin" "%OUT_DIR%\gameos.bin"
 
-:: Use starfire tool to create the out file
-wsl.exe -- bash -lc "cd ../Tools/spl_tool && ./spl_tool -c -f ../../gameos/%OUT_DIR%/gameos.bin"
+:: Use StarFive's spl_tool (in WSL) to add the SPL header and create the out file.
+:: SPL_TOOL_DIR can be set before running this script; it defaults to ..\Tools\spl_tool
+if not defined SPL_TOOL_DIR set "SPL_TOOL_DIR=..\Tools\spl_tool"
+for %%I in ("%SPL_TOOL_DIR%") do set "SPL_TOOL_ABS=%%~fI"
+for %%I in ("%OUT_DIR%\gameos.bin") do set "IMAGE_ABS=%%~fI"
+wsl.exe -- bash -lc "cd \"$(wslpath -u '%SPL_TOOL_ABS%')\" && ./spl_tool -c -f \"$(wslpath -u '%IMAGE_ABS%')\""
