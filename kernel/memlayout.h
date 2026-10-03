@@ -1,0 +1,8 @@
+#ifndef MEMLAYOUT_H
+#define MEMLAYOUT_H
+
+#define TRAMPOLINE (MAXVA - PGSIZE)
+
+#define TRAPFRAME (TRAMPOLINE - PGSIZE)
+
+#endif // !MEMLAYOUT
