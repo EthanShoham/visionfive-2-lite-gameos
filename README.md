@@ -84,14 +84,19 @@ The long-term goal is a custom handheld PC: this board, a custom OS, and games w
 ## Building
 
 Requirements:
-- Windows with the [xPack RISC-V GCC toolchain](https://xpack-dev-tools.github.io/riscv-none-elf-gcc-xpack/) (`riscv-none-elf-gcc`) on `PATH`
-- WSL with StarFive's [`spl_tool`](https://github.com/starfive-tech/Tools) built inside it
+- The `riscv-none-elf` GCC toolchain, e.g. [xPack RISC-V GCC](https://xpack-dev-tools.github.io/riscv-none-elf-gcc-xpack/), on `PATH`
+- StarFive's [`spl_tool`](https://github.com/starfive-tech/Tools) to add the SPL header the boot ROM expects
+- A serial terminal that supports XMODEM, for flashing and the console, e.g. Tera Term, ExtraPuTTY (plain PuTTY has no XMODEM), or minicom with `lrzsz` on Linux
+
+The only Windows-specific part is the build script, `build.bat`. It calls `spl_tool` through WSL:
 
 ```bat
 :: Optional: where spl_tool is (default: ..\Tools\spl_tool)
 set SPL_TOOL_DIR=C:\path\to\Tools\spl_tool
 build.bat
 ```
+
+On Linux or macOS, run the same compile, link and `objcopy` steps from `build.bat`, then `spl_tool -c -f out/gameos.bin`.
 
 The output is `out/gameos.bin.normal.out`, an image with the SPL header that the boot ROM can load.
 
